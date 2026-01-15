@@ -12,47 +12,48 @@ class EstimatingPC:
 
     @staticmethod
     def check_modern(cpu):
-        if pd.notna(cpu):
-            old_cpu_list = ['core', 'atom', 'xeon', 'pentium', 'celeron',
-                            'athlon', 'a4', 'a6', 'a8', 'a10', 'a12', 'fx',
-                            'phenom', 'sun']
-            for old_cpu in old_cpu_list:
-                if old_cpu in cpu:
-                    if old_cpu == "core":
-                        if "core 2" in cpu or "core q" in cpu:
+        old_cpu_list = ['core', 'atom', 'xeon', 'pentium', 'celeron',
+                        'athlon', 'a4', 'a6', 'a8', 'a10', 'a12', 'fx',
+                        'phenom', 'sun']
+        for old_cpu in old_cpu_list:
+            if old_cpu in cpu:
+                if old_cpu == "core":
+                    if "core 2" in cpu or "core q" in cpu:
+                        return False
+                    elif "ultra" in cpu:
+                        return True
+                    else:
+                        match = re.search(r'[iI]([3579])[- ](\d{4,5})', cpu)
+                        if not match:
                             return False
-                        elif "ultra" in cpu:
+                        model_number = match.group(2)
+
+                        if len(model_number) == 5:
                             return True
+                        elif len(model_number) == 4:
+                            return False
                         else:
-                            match = re.search(r'[iI]([3579])[- ](\d{4,5})', cpu)
-                            if not match:
-                                return False
-                            model_number = match.group(2)
-
-                            if len(model_number) == 5:
-                                return True
-                            elif len(model_number) == 4:
-                                return False
-                            else:
-                                return False
-
-                    if old_cpu == "pentium":
-                        if "pentium gold" in cpu:
                             return False
 
-                    if old_cpu == "celeron":
-                        if "celeron n" in cpu:
-                            return False
+                if old_cpu == "pentium":
+                    if "pentium gold" in cpu:
+                        return False
 
-                    if old_cpu == "athlon":
-                        if "athlon gold" in cpu or "athlon silver" in cpu or "athlon 3" in cpu:
-                            return False
-                    return False
-            return True
-        return False
+                if old_cpu == "celeron":
+                    if "celeron n" in cpu:
+                        return False
+
+                if old_cpu == "athlon":
+                    if "athlon gold" in cpu or "athlon silver" in cpu or "athlon 3" in cpu:
+                        return False
+                return False
+        return True
 
     @staticmethod
     def check_cpu(cpu, core, frequency_ghz):
+        if "unknown" in cpu:
+            return 0.0
+        
         cpu_score = 0
         cpu_small_list = ['pentium', 'celeron', 'athlon', 'n100', 'n200']
         cpu_low_list = ['i3', 'ryzen 3']
@@ -81,9 +82,6 @@ class EstimatingPC:
             cpu_score += 2
         elif frequency_ghz > 4800:
             cpu_score += 3
-
-        if pd.isna(cpu):
-            return 0.0
 
         for cpu_small in cpu_small_list:
             if cpu_small in cpu:
@@ -119,146 +117,145 @@ class EstimatingPC:
 
         Учитывает: поколение карты, модель и объём VRAM
         """
-        if pd.isna(gpu):
+        if "unknown" in gpu:
             return 0.0
 
-        gpu_lower = str(gpu).lower().strip()
         gpu_score = 0.0
 
         # Нет видеокарты
-        if "без" in gpu_lower or "graphics" in gpu_lower:
+        if "без" in gpu or "graphics" in gpu:
             if vram_gb <= 0.0:
                 return 0.5  # Интегрированная графика
             else:
                 return 1.0
 
         # === NVIDIA ===
-        if 'rtx 50' in gpu_lower:
-            if '5090' in gpu_lower:
+        if 'rtx 50' in gpu:
+            if '5090' in gpu:
                 gpu_score = 10.0
-            elif '5080' in gpu_lower:
+            elif '5080' in gpu:
                 gpu_score = 9.5
-            elif '5070' in gpu_lower:
+            elif '5070' in gpu:
                 gpu_score = 9
-            elif '5060' in gpu_lower:
+            elif '5060' in gpu:
                 gpu_score = 8
 
-        if 'rtx 40' in gpu_lower:
-            if '4090' in gpu_lower:
+        if 'rtx 40' in gpu:
+            if '4090' in gpu:
                 gpu_score = 9.5
-            elif '4080' in gpu_lower:
+            elif '4080' in gpu:
                 gpu_score = 9.0
-            elif '4070' in gpu_lower:
+            elif '4070' in gpu:
                 gpu_score = 8.5
-            elif '4060' in gpu_lower:
+            elif '4060' in gpu:
                 gpu_score = 7.5
 
-        if 'rtx 30' in gpu_lower:
-            if '3090' in gpu_lower:
+        if 'rtx 30' in gpu:
+            if '3090' in gpu:
                 gpu_score = 8
-            elif '3080' in gpu_lower:
+            elif '3080' in gpu:
                 gpu_score = 7.5
-            elif '3070' in gpu_lower:
+            elif '3070' in gpu:
                 gpu_score = 6.5
-            elif '3060' in gpu_lower:
+            elif '3060' in gpu:
                 gpu_score = 6.0
-            elif '3050' in gpu_lower:
+            elif '3050' in gpu:
                 gpu_score = 5.0
 
-        if 'rtx 20' in gpu_lower:
-            if '2080' in gpu_lower:
+        if 'rtx 20' in gpu:
+            if '2080' in gpu:
                 gpu_score = 6.5
-            elif '2070' in gpu_lower:
+            elif '2070' in gpu:
                 gpu_score = 5.5
-            elif '2060' in gpu_lower:
+            elif '2060' in gpu:
                 gpu_score = 4.5
 
-        if 'gtx 16' in gpu_lower:
-            if '1660' in gpu_lower:
+        if 'gtx 16' in gpu:
+            if '1660' in gpu:
                 gpu_score = 3.5
-            elif '1650' in gpu_lower:
+            elif '1650' in gpu:
                 gpu_score = 3.25
 
-        if 'gtx 10' in gpu_lower:
-            if '1080' in gpu_lower:
+        if 'gtx 10' in gpu:
+            if '1080' in gpu:
                 gpu_score = 3
-            elif '1070' in gpu_lower:
+            elif '1070' in gpu:
                 gpu_score = 2.5
-            elif '1060' in gpu_lower:
+            elif '1060' in gpu:
                 gpu_score = 2
-            elif '1050' in gpu_lower:
+            elif '1050' in gpu:
                 gpu_score = 1.5
 
-        if 'gtx 9' in gpu_lower:
-            if '980' in gpu_lower or '970' in gpu_lower:
+        if 'gtx 9' in gpu:
+            if '980' in gpu or '970' in gpu:
                 gpu_score = 1.5
-            elif '960' in gpu_lower or '950' in gpu_lower:
+            elif '960' in gpu or '950' in gpu:
                 gpu_score = 1
-            elif 'gtx' in gpu_lower:
+            elif 'gtx' in gpu:
                 gpu_score = 0.5
 
         # === AMD ===
 
         # RX 7000 Series (2022-2024) - Топовые
-        if 'rx 7' in gpu_lower:
-            if '7900' in gpu_lower:
+        if 'rx 7' in gpu:
+            if '7900' in gpu:
                 gpu_score = 9.5
-            elif '7800' in gpu_lower:
+            elif '7800' in gpu:
                 gpu_score = 8.5
-            elif '7700' in gpu_lower:
+            elif '7700' in gpu:
                 gpu_score = 7.5
-            elif '7600' in gpu_lower:
+            elif '7600' in gpu:
                 gpu_score = 6.5
 
-        if 'rx 6' in gpu_lower:
-            if '6950' in gpu_lower or '6900' in gpu_lower:
+        if 'rx 6' in gpu:
+            if '6950' in gpu or '6900' in gpu:
                 gpu_score = 8.0
-            elif '6800' in gpu_lower:
+            elif '6800' in gpu:
                 gpu_score = 7.5
-            elif '6700' in gpu_lower:
+            elif '6700' in gpu:
                 gpu_score = 6.5
-            elif '6600' in gpu_lower:
+            elif '6600' in gpu:
                 gpu_score = 5.5
-            elif '6500' in gpu_lower:
+            elif '6500' in gpu:
                 gpu_score = 4.0
-            elif '6400' in gpu_lower:
+            elif '6400' in gpu:
                 gpu_score = 3.0
 
-        if 'rx 5' in gpu_lower:
-            if '5700' in gpu_lower:
+        if 'rx 5' in gpu:
+            if '5700' in gpu:
                 gpu_score = 5.0
-            elif '5600' in gpu_lower:
+            elif '5600' in gpu:
                 gpu_score = 4.5
-            elif '5500' in gpu_lower:
+            elif '5500' in gpu:
                 gpu_score = 3.5
 
-        if 'vega' in gpu_lower:
-            if 'radeon vii' in gpu_lower or 'radeon 7' in gpu_lower:
+        if 'vega' in gpu:
+            if 'radeon vii' in gpu or 'radeon 7' in gpu:
                 gpu_score = 5.0
-            elif '64' in gpu_lower and 'rx' in gpu_lower:
+            elif '64' in gpu and 'rx' in gpu:
                 gpu_score = 4.0
-            elif '56' in gpu_lower and 'rx' in gpu_lower:
+            elif '56' in gpu and 'rx' in gpu:
                 gpu_score = 3.5
-            elif 'vega' in gpu_lower and any(x in gpu_lower for x in ['11', '10', '8', '7', '6', '3']):
+            elif 'vega' in gpu and any(x in gpu for x in ['11', '10', '8', '7', '6', '3']):
                 gpu_score = 0.5  # Интегрированная Vega
 
-        elif 'rx 590' in gpu_lower:
+        elif 'rx 590' in gpu:
             gpu_score = 3.0
-        elif 'rx 580' in gpu_lower or 'rx 570' in gpu_lower:
+        elif 'rx 580' in gpu or 'rx 570' in gpu:
             gpu_score = 2.5
-        elif 'rx 560' in gpu_lower or 'rx 550' in gpu_lower:
+        elif 'rx 560' in gpu or 'rx 550' in gpu:
             gpu_score = 1.5
 
         # R9/R7/R5 Series (2013-2016) - Устаревшие
-        elif 'r9 290' in gpu_lower or 'r9 390' in gpu_lower or 'r9 fury' in gpu_lower:
+        elif 'r9 290' in gpu or 'r9 390' in gpu or 'r9 fury' in gpu:
             gpu_score = 2.0
-        elif 'r9' in gpu_lower:
+        elif 'r9' in gpu:
             gpu_score = 1.5
-        elif 'r7' in gpu_lower:
+        elif 'r7' in gpu:
             gpu_score = 1.0
-        elif 'r5' in gpu_lower:
+        elif 'r5' in gpu:
             gpu_score = 0.5
-        elif 'r3' in gpu_lower or 'r4' in gpu_lower:
+        elif 'r3' in gpu or 'r4' in gpu:
             gpu_score = 0.0  # Интегрированная
 
         # Бонус за VRAM
@@ -281,31 +278,74 @@ class EstimatingPC:
         - Тип RAM: до 2 баллов (20%)
         - Частота RAM: до 2 баллов (20%)
         """
-        try:
-            if pd.notna(type_ram):
-                type_ram = str(type_ram).lower().strip()
-            else:
-                type_ram = ""
-
-            if pd.notna(ghz):
-                ghz = float(ghz)
-            else:
-                ghz = 0.0
-
-            if pd.notna(gb):
-                gb = float(gb)
-            else:
-                gb = 0.0
-        except Exception as e:
-            print(f"Ошибка преобразования RAM: {e}")
-            return 0.0
-
         ram_score = 0.0
+        type_score = 0.0
+        frequency_score = 0.0
 
         # Проверка на устаревшую память
-        if "ddr1" in type_ram or "ddr2" in type_ram:
-            return 0.0
+        if "unknown" not in type_ram:
+            if "ddr1" in type_ram or "ddr2" in type_ram:
+                return 0.0
+            elif "ddr5" in type_ram or "lpddr5" in type_ram:
+                type_score = 2.0
+            elif "ddr4" in type_ram or "lpddr4" in type_ram:
+                type_score = 1.0
+            elif "ddr3" in type_ram or "lpddr3" in type_ram:
+                type_score = 0.2
+            else:
+                type_score = 0.0
 
+            if "ddr5" in type_ram or "lpddr5" in type_ram:
+                if ghz >= 7200:
+                    frequency_score = 2.0
+                elif ghz >= 6400:
+                    frequency_score = 1.5
+                elif ghz >= 6000:
+                    frequency_score = 1.2
+                elif ghz >= 5600:
+                    frequency_score = 1.0
+                elif ghz >= 5200:
+                    frequency_score = 0.7
+                elif ghz >= 4800:
+                    frequency_score = 0.5
+                else:
+                    frequency_score = 0.2
+
+            elif "ddr4" in type_ram or "lpddr4" in type_ram:
+                if ghz >= 4000:
+                    frequency_score = 2.0
+                elif ghz >= 3600:
+                    frequency_score = 1.5
+                elif ghz >= 3200:
+                    frequency_score = 1.2
+                elif ghz >= 2666:
+                    frequency_score = 0.8
+                elif ghz >= 2400:
+                    frequency_score = 0.6
+                elif ghz >= 2133:
+                    frequency_score = 0.4
+                elif ghz >= 1600:
+                    frequency_score = 0.2
+                else:
+                    frequency_score = 0.0
+
+            elif "ddr3" in type_ram or "lpddr3" in type_ram:
+                if ghz >= 2400:
+                    frequency_score = 1.0
+                elif ghz >= 1866:
+                    frequency_score = 0.7
+                elif ghz >= 1600:
+                    frequency_score = 0.5
+                elif ghz >= 1333:
+                    frequency_score = 0.3
+                elif ghz >= 800:
+                    frequency_score = 0.2
+                else:
+                    frequency_score = 0.0
+
+        ram_score += type_score
+        ram_score += frequency_score
+        
         # 1. ОЦЕНКА ОБЪЁМА (60% = 6 баллов)
         if gb >= 64:
             capacity_score = 6.0
@@ -321,71 +361,7 @@ class EstimatingPC:
             capacity_score = 0.0
 
         ram_score += capacity_score
-
-        # 2. ОЦЕНКА ТИПА RAM (20% = 2 балла)
-        if "ddr5" in type_ram or "lpddr5" in type_ram:
-            type_score = 2.0
-        elif "ddr4" in type_ram or "lpddr4" in type_ram:
-            type_score = 1.0
-        elif "ddr3" in type_ram or "lpddr3" in type_ram:
-            type_score = 0.2
-        else:
-            type_score = 0.0
-
-        ram_score += type_score
-
-        # 3. ОЦЕНКА ЧАСТОТЫ (20% = 2 балла)
-        frequency_score = 0.0
-
-        if "ddr5" in type_ram or "lpddr5" in type_ram:
-            if ghz >= 7200:
-                frequency_score = 2.0
-            elif ghz >= 6400:
-                frequency_score = 1.5
-            elif ghz >= 6000:
-                frequency_score = 1.2
-            elif ghz >= 5600:
-                frequency_score = 1.0
-            elif ghz >= 5200:
-                frequency_score = 0.7
-            elif ghz >= 4800:
-                frequency_score = 0.5
-            else:
-                frequency_score = 0.2
-
-        elif "ddr4" in type_ram or "lpddr4" in type_ram:
-            if ghz >= 4000:
-                frequency_score = 2.0
-            elif ghz >= 3600:
-                frequency_score = 1.5
-            elif ghz >= 3200:
-                frequency_score = 1.2
-            elif ghz >= 2666:
-                frequency_score = 0.8
-            elif ghz >= 2400:
-                frequency_score = 0.6
-            elif ghz >= 2133:
-                frequency_score = 0.4
-            elif ghz >= 1600:
-                frequency_score = 0.2
-            else:
-                frequency_score = 0.0
-
-        elif "ddr3" in type_ram or "lpddr3" in type_ram:
-            if ghz >= 2400:
-                frequency_score = 1.0
-            elif ghz >= 1866:
-                frequency_score = 0.7
-            elif ghz >= 1600:
-                frequency_score = 0.5
-            elif ghz >= 1333:
-                frequency_score = 0.3
-            elif ghz >= 800:
-                frequency_score = 0.2
-            else:
-                frequency_score = 0.0
-
-        ram_score += frequency_score
+        
 
         return min(ram_score, 10.0)
 
@@ -396,102 +372,99 @@ class EstimatingPC:
 
         Оценивает по чипсету и сокету
         """
-        if pd.isna(mb) and pd.isna(socket):
+        if "unknown" in mb:
             return 0.0
-
-        mb_lower = str(mb).lower().strip() if pd.notna(mb) else ""
-        socket_lower = str(socket).lower().strip() if pd.notna(socket) else ""
 
         mb_score = 0.0
 
         # === ОЦЕНКА ПО ЧИПСЕТУ (3 балла) ===
 
         # Intel - Актуальные чипсеты
-        if any(chip in mb_lower for chip in ['z890', 'z790', 'z690']):
+        if any(chip in mb for chip in ['z890', 'z790', 'z690']):
             mb_score += 3.0  # Топовые Z-серии
-        elif any(chip in mb_lower for chip in ['b760', 'b660', 'h770', 'h670']):
+        elif any(chip in mb for chip in ['b760', 'b660', 'h770', 'h670']):
             mb_score += 2.5  # Средние современные
-        elif any(chip in mb_lower for chip in ['h610', 'h510', 'b560']):
+        elif any(chip in mb for chip in ['h610', 'h510', 'b560']):
             mb_score += 2.0  # Бюджетные современные
 
         # Intel - Устаревающие
-        elif any(chip in mb_lower for chip in ['z590', 'z490', 'b460', 'h470']):
+        elif any(chip in mb for chip in ['z590', 'z490', 'b460', 'h470']):
             mb_score += 1.5
-        elif any(chip in mb_lower for chip in ['z390', 'z370', 'h370', 'b360', 'h310']):
+        elif any(chip in mb for chip in ['z390', 'z370', 'h370', 'b360', 'h310']):
             mb_score += 1.0
 
         # Intel - Старые
-        elif any(chip in mb_lower for chip in ['z270', 'z170', 'h270', 'h110', 'b250']):
+        elif any(chip in mb for chip in ['z270', 'z170', 'h270', 'h110', 'b250']):
             mb_score += 0.5
-        elif any(chip in mb_lower for chip in ['z97', 'z87', 'h97', 'h87', 'b85', 'h81']):
+        elif any(chip in mb for chip in ['z97', 'z87', 'h97', 'h87', 'b85', 'h81']):
             mb_score += 0.2
 
         # Intel - Очень старые
-        elif any(chip in mb_lower for chip in ['x79', 'x99', 'x299']):
+        elif any(chip in mb for chip in ['x79', 'x99', 'x299']):
             mb_score += 0.5  # HEDT платформы
-        elif any(chip in mb_lower for chip in ['h61', 'h67', 'p67', 'z68']):
+        elif any(chip in mb for chip in ['h61', 'h67', 'p67', 'z68']):
             mb_score += 0.0
 
         # AMD - Актуальные чипсеты
-        elif any(chip in mb_lower for chip in ['x870', 'x670', 'b650', 'a620']):
+        elif any(chip in mb for chip in ['x870', 'x670', 'b650', 'a620']):
             mb_score += 3.0  # AM5 платформа (DDR5)
-        elif any(chip in mb_lower for chip in ['x570', 'b550', 'a520']):
+        elif any(chip in mb for chip in ['x570', 'b550', 'a520']):
             mb_score += 2.5  # AM4 топовые
-        elif 'b450' in mb_lower:
+        elif 'b450' in mb:
             mb_score += 2.0  # AM4 средние
-        elif any(chip in mb_lower for chip in ['a320', 'b350', 'x370']):
+        elif any(chip in mb for chip in ['a320', 'b350', 'x370']):
             mb_score += 1.5  # AM4 старые
 
         # AMD - Устаревшие
-        elif any(chip in mb_lower for chip in ['a88x', 'a78', 'a68', 'a58']):
+        elif any(chip in mb for chip in ['a88x', 'a78', 'a68', 'a58']):
             mb_score += 0.5
-        elif any(chip in mb_lower for chip in ['990fx', '970', '880g']):
+        elif any(chip in mb for chip in ['990fx', '970', '880g']):
             mb_score += 0.2
 
         # Если чипсет не определён, но есть название платы
-        elif mb_lower and mb_lower not in ['null', 'amd', 'intel']:
+        elif mb and mb not in ['null', 'amd', 'intel']:
             mb_score += 1.0  # Минимум за наличие платы
 
         # === ОЦЕНКА ПО СОКЕТУ (2 балла) ===
 
         # Intel - Современные сокеты
-        if 'lga 1851' in socket_lower:
+        if 'lga 1851' in socket:
             mb_score += 2.0  # LGA 1851 (Arrow Lake, 2024+)
-        elif 'lga 1700' in socket_lower:
+        elif 'lga 1700' in socket:
             mb_score += 1.8  # LGA 1700 (12-14 gen, 2021-2024)
-        elif 'lga 1200' in socket_lower:
+        elif 'lga 1200' in socket:
             mb_score += 1.5  # LGA 1200 (10-11 gen, 2020-2021)
 
         # Intel - Устаревшие сокеты
-        elif 'lga 1151' in socket_lower:
+        elif 'lga 1151' in socket:
             mb_score += 1.0  # LGA 1151 (6-9 gen)
-        elif 'lga 1150' in socket_lower or 'lga 1155' in socket_lower:
+        elif 'lga 1150' in socket or 'lga 1155' in socket:
             mb_score += 0.5  # Старые
-        elif 'lga 2011' in socket_lower or 'lga 2066' in socket_lower:
+        elif 'lga 2011' in socket or 'lga 2066' in socket:
             mb_score += 0.8  # HEDT платформы
 
         # AMD - Современные сокеты
-        elif 'am5' in socket_lower:
+        elif 'am5' in socket:
             mb_score += 2.0  # AM5 (Ryzen 7000+, DDR5, 2022+)
-        elif 'am4' in socket_lower:
+        elif 'am4' in socket:
             mb_score += 1.5  # AM4 (Ryzen 1000-5000, 2017-2022)
 
         # AMD - Устаревшие сокеты
-        elif 'am3' in socket_lower or 'am3+' in socket_lower:
+        elif 'am3' in socket or 'am3+' in socket:
             mb_score += 0.5
-        elif 'fm2' in socket_lower or 'fm2+' in socket_lower:
+        elif 'fm2' in socket or 'fm2+' in socket:
             mb_score += 0.3
 
         # Мобильные сокеты (BGA - распаянные)
-        elif any(bga in socket_lower for bga in ['bga 2049', 'bga 1744', 'bga 1449']):
+        elif any(bga in socket for bga in ['bga 2049', 'bga 1744', 'bga 1449']):
             mb_score += 1.0  # Современные мобильные
-        elif 'bga' in socket_lower:
+        elif 'bga' in socket:
             mb_score += 0.5  # Старые мобильные
 
         # Мобильные сокеты AMD (FP)
-        elif any(fp in socket_lower for fp in ['fp7', 'fp8']):
+        elif any(fp in socket for fp in ['fp7', 'fp8']):
             mb_score += 1.5  # Современные AMD мобильные
-        elif any(fp in socket_lower for fp in ['fp5', 'fp6']):
+        elif any(fp in socket for fp in ['fp5', 'fp6']):
             mb_score += 1.0
 
         return min(mb_score, 5.0)
@@ -543,31 +516,12 @@ class EstimatingPC:
 
         Возвращает: "Отличная цена" / "Хорошая цена" / "Приемлемо" / "Дорого" / "Очень дорого"
         """
-        try:
-            if pd.notna(price):
-                price = float(price)
-            else:
-                return "Нет данных о цене"
-
-            if pd.notna(new):
-                new_lower = str(new).lower().strip()
-            else:
-                new_lower = "no"
-
-            if pd.notna(os):
-                os_lower = str(os).lower().strip()
-            else:
-                os_lower = ""
-        except Exception as e:
-            print(f"Ошибка в check_price: {e}")
-            return "Ошибка данных"
-
         # Коэффициент для б/у (скидка 20-30%)
-        condition_multiplier = 1.0 if new_lower == "yes" else 0.90
+        condition_multiplier = 1.0 if new == "yes" else 0.90
 
         # Штраф за отсутствие ОС или FreeDOS
         os_penalty = 0
-        if os_lower in ['null', 'freedos', 'dos', '']:
+        if os in ['null', 'freedos', 'dos', '']:
             os_penalty = 3000
 
         # Расчёт ожидаемой цены на основе баллов
@@ -606,17 +560,6 @@ class EstimatingPC:
         else:
             return "Плохая"
 
-    @staticmethod
-    def get_number(number_string):
-        try:
-            if pd.notna(number_string):
-                return float(number_string)
-            else:
-                return 0.0
-        except Exception as e:
-            print(f"Ошибка преобразования числа: {e}")
-            return 0.0
-
     def estimating(self):
         """Оценка всех ПК в датасете"""
         df = pd.read_csv(self.dataset_file_path)
@@ -630,13 +573,13 @@ class EstimatingPC:
             #     continue
 
             # Получение числовых параметров
-            cpu_core = self.get_number(pc['core'])
-            cpu_ghz = self.get_number(pc['frequency_ghz'])
-            gpu_vram = self.get_number(pc['vram_gb'])
-            ram_ghz = self.get_number(pc['ram_ghz'])
-            ram_gb = self.get_number(pc['ram_gb'])
-            storage_gb = self.get_number(pc['storage_gb'])
-            power = self.get_number(pc['power_supply'])
+            cpu_core = pc['core']
+            cpu_ghz = pc['frequency_ghz']
+            gpu_vram = pc['vram_gb']
+            ram_ghz = pc['ram_ghz']
+            ram_gb = pc['ram_gb']
+            storage_gb = pc['storage_gb']
+            power = pc['power_supply']
 
             # Оценка компонентов
             cpu_score = self.check_cpu(pc['model_cpu'], cpu_core, cpu_ghz)

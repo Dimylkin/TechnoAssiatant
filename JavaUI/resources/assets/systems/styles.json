@@ -1,0 +1,64 @@
+{
+  "light": {
+    "background": "-fx-background-color: #f5f5f5;",
+    "card": "-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 20, 0, 0, 5);",
+    "cardSmall": "-fx-padding: 20; -fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-border-width: 1;",
+    "scrollPane": "-fx-background-color: transparent; -fx-background: #f5f5f5;",
+    "icon": "-fx-opacity: 0.95;",
+    "title": "-fx-background-color: #667eea;",
+
+    "textPrimary": "-fx-text-fill: #1f2937;",
+    "textSecondary": "-fx-text-fill: #4b5563;",
+    "textMuted": "-fx-text-fill: #9ca3af;",
+    "dangerText": "-fx-text-fill: #ef4444;",
+	
+	"successText": "-fx-text-fill: #27ae60;",
+	"warningText": "-fx-text-fill: #f39c12;",
+	"accentText": "-fx-text-fill: #667eea;",
+
+    "buttonBase": "-fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;",
+	"navButtonOnMouseExited": "-fx-background-color: transparent; -fx-background-radius: 6; -fx-cursor: hand;",
+	"navButtonOnMouseEntered": "-fx-background-color: rgba(255,255,255,0.20); -fx-background-radius: 6; -fx-cursor: hand;",
+	"primaryButtonOnMouseExited": "-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;",
+	"primaryButtonOnMouseEntered": "-fx-background-color: #5a6fe0; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;",
+
+    "labelSmall": "-fx-font-size: 13px; -fx-text-fill: #4b5563;",
+    "labelMiddle": "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #374151;",
+    "labelLarge": "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #111827;",
+    "labelTitle": "-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;",
+
+    "input": "-fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8;"
+  },
+
+  "dark": {
+    "background": "-fx-background-color: #0f172a;",
+    "card": "-fx-background-color: #111827; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 25, 0, 0, 8);",
+    "cardSmall": "-fx-padding: 20; -fx-background-color: #0b1220; -fx-background-radius: 10; -fx-border-color: #233047; -fx-border-radius: 10; -fx-border-width: 1;",
+    "scrollPane": "-fx-background-color: transparent; -fx-background: #0f172a;",
+    "icon": "-fx-opacity: 0.95;",
+    "title": "-fx-background-color: #4f46e5;",
+
+    "textPrimary": "-fx-text-fill: #e5e7eb;",
+    "textSecondary": "-fx-text-fill: #cbd5e1;",
+    "textMuted": "-fx-text-fill: #94a3b8;",
+    "dangerText": "-fx-text-fill: #f87171;",
+	
+	"successText": "-fx-text-fill: #34d399;",
+	"warningText": "-fx-text-fill: #fbbf24;",
+	"accentText": "-fx-text-fill: #818cf8;",
+
+    "buttonBase": "-fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;",
+	"navButtonOnMouseExited": "-fx-background-color: transparent; -fx-background-radius: 6; -fx-cursor: hand;",
+	"navButtonOnMouseEntered": "-fx-background-color: rgba(255,255,255,0.18); -fx-background-radius: 6; -fx-cursor: hand;",
+
+	"primaryButtonOnMouseExited": "-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;",
+	"primaryButtonOnMouseEntered": "-fx-background-color: #4338ca; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;",
+
+    "labelSmall": "-fx-font-size: 13px; -fx-text-fill: #cbd5e1;",
+    "labelMiddle": "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e5e7eb;",
+    "labelLarge": "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f1f5f9;",
+    "labelTitle": "-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;",
+
+    "input": "-fx-background-color: #0b1220; -fx-border-color: #233047; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8; -fx-text-fill: #e5e7eb; -fx-prompt-text-fill: #94a3b8;"
+  }
+}

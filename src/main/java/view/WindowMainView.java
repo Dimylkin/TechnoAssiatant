@@ -101,6 +101,8 @@ public final class WindowMainView {
             submitButton,
             aiVersionLabel
         );
+
+        fillTestData("Хорошая");
     }
 
     public Stage createLoadingDialog(Stage owner) {

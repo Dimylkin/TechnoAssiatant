@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -127,7 +129,9 @@ public class WindowMainLogic extends BaseWindowLogic {
             }
 
             StringBuilder output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+            try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+            )) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     output.append(line).append("\n");
@@ -149,15 +153,50 @@ public class WindowMainLogic extends BaseWindowLogic {
     }
 
     private Process startPythonProcess(String scriptPath) throws IOException {
-        try {
-            ProcessBuilder windowsPython = new ProcessBuilder("py", "-3", scriptPath);
-            windowsPython.redirectErrorStream(true);
-            return windowsPython.start();
-        } catch (IOException windowsLauncherError) {
-            ProcessBuilder linuxPython = new ProcessBuilder("python3", scriptPath);
-            linuxPython.redirectErrorStream(true);
-            return linuxPython.start();
+        Path pythonExecutable = getPythonExecutable();
+
+        if (!Files.exists(pythonExecutable)) {
+            throw new IOException(
+                "Python virtual environment not found: " + pythonExecutable
+                    + ". Run './app install' first."
+            );
         }
+
+        ProcessBuilder processBuilder = new ProcessBuilder(
+            pythonExecutable.toString(),
+            scriptPath
+        );
+
+        processBuilder.redirectErrorStream(true);
+        processBuilder.environment().put("PYTHONUTF8", "1");
+
+        return processBuilder.start();
+    }
+
+    private Path getPythonExecutable() {
+        Path pythonDir = AppPaths.PYTHON_PREDICT_SCRIPT
+            .toAbsolutePath()
+            .normalize()
+            .getParent()
+            .getParent();
+
+        String osName = System.getProperty("os.name").toLowerCase();
+
+        if (osName.contains("win")) {
+            return pythonDir
+                .resolve(".venv")
+                .resolve("Scripts")
+                .resolve("python.exe")
+                .toAbsolutePath()
+                .normalize();
+        }
+
+        return pythonDir
+            .resolve(".venv")
+            .resolve("bin")
+            .resolve("python")
+            .toAbsolutePath()
+            .normalize();
     }
 
     public static Double tryParseDouble(String number) {

@@ -1,0 +1,19 @@
+target/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Python
+PythonAI/.venv/
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# OS/editor
+.DS_Store
+Thumbs.db
